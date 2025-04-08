@@ -1,0 +1,8 @@
+[build]
+  publish = "."
+
+# Handle SPA routing with history API
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
