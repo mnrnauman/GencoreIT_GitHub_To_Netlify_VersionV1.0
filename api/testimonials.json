@@ -1,0 +1,46 @@
+{
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Sarah Johnson",
+      "position": "CTO, TechVision Inc.",
+      "content": "Working with GenCore IT has been transformative for our business. Their cloud solutions have improved our system reliability by 99.9% and reduced our infrastructure costs by 40%.",
+      "rating": 5
+    },
+    {
+      "id": 2,
+      "name": "Michael Chen",
+      "position": "Director of Operations, GlobalHealth",
+      "content": "The cybersecurity solutions implemented by GenCore IT have given us peace of mind. Their team's expertise in HIPAA compliance has been invaluable for our healthcare organization.",
+      "rating": 5
+    },
+    {
+      "id": 3,
+      "name": "Amanda Rodriguez",
+      "position": "Marketing Director, Retail Innovations",
+      "content": "GenCore IT delivered our e-commerce platform ahead of schedule and under budget. Their attention to detail and responsive customer service exceeded our expectations.",
+      "rating": 4
+    },
+    {
+      "id": 4,
+      "name": "David Williams",
+      "position": "CEO, FinanceFirst",
+      "content": "We've partnered with GenCore IT for over 5 years, and they consistently deliver high-quality IT support. Their team is responsive, knowledgeable, and always goes the extra mile.",
+      "rating": 5
+    },
+    {
+      "id": 5,
+      "name": "James Thompson",
+      "position": "IT Manager, Educational Services Ltd",
+      "content": "Our digital transformation journey with GenCore IT has revolutionized how we operate. Their solutions have helped us improve student engagement and streamline administrative processes.",
+      "rating": 5
+    },
+    {
+      "id": 6,
+      "name": "Lisa Martin",
+      "position": "Operations Director, Manufacturing Excellence",
+      "content": "GenCore IT's IoT implementation has given us real-time visibility into our production line, resulting in a 25% increase in efficiency and significantly reduced downtime.",
+      "rating": 4
+    }
+  ]
+}
