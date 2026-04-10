@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const RECIPIENT_EMAIL = "nauman@gencoreit.com";
+const RECIPIENT_EMAIL = "info@gencoreit.com";
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
