@@ -123,10 +123,16 @@
 
     var allSections = root.querySelectorAll('section');
     var targetSection = null;
+    var py20Count = 0;
     for (var i = 0; i < allSections.length; i++) {
       if (allSections[i].className && allSections[i].className.indexOf('py-20') !== -1) {
-        targetSection = allSections[i];
-        break;
+        py20Count++;
+        /* Skip the FIRST py-20 section — that is the hero.
+           Insert before the SECOND py-20 section (Services). */
+        if (py20Count === 2) {
+          targetSection = allSections[i];
+          break;
+        }
       }
     }
 
