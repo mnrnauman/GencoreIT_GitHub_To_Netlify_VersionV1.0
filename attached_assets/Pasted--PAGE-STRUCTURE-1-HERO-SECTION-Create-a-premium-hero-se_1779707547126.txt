@@ -1,0 +1,361 @@
+# PAGE STRUCTURE
+
+1. HERO SECTION  
+  
+
+Create a premium hero section with:
+
+Headline:  
+“High Performance VPS Hosting”
+
+Subheadline:  
+“NVMe SSD VPS Servers with Dedicated Resources, Instant Deployment & Full Root Access”
+
+Buttons:
+
+- Deploy Now
+- View Pricing
+
+Hero features:
+
+- Animated gradient background
+- Floating glow effects
+- Infrastructure/server illustration
+- Trust badges:
+    - AMD EPYC CPUs
+    - NVMe SSD
+    - KVM Virtualization
+    - 99.99% Uptime
+    - DDoS Protection
+
+2. BILLING TOGGLE
+
+Add:
+
+- Monthly
+- Yearly (Save 20%)
+
+Must dynamically update pricing.
+3. VPS PRICING CARDS
+
+Create 4 premium pricing cards.
+
+PLAN 1:  
+VPS Starter
+
+- 1 vCPU
+- 2GB RAM
+- 40GB NVMe
+- 2TB bandwidth
+- $6/month
+
+PLAN 2:  
+VPS Business
+
+- 2 vCPU
+- 4GB RAM
+- 80GB NVMe
+- 4TB bandwidth
+- $12/month
+- Mark as MOST POPULAR
+
+PLAN 3:  
+VPS Pro
+
+- 4 vCPU
+- 8GB RAM
+- 160GB NVMe
+- 8TB bandwidth
+- $24/month
+
+PLAN 4:  
+VPS Enterprise
+
+- 8 vCPU
+- 16GB RAM
+- 320GB NVMe
+- 16TB bandwidth
+- $48/month
+
+Each card must include:
+
+- Plan title
+- Price
+- CPU
+- RAM
+- Storage
+- Bandwidth
+- Full root access
+- Linux/Windows support
+- Free IPv4
+- Weekly backups
+- Instant deployment
+- CTA button
+
+Design:
+
+- Premium dark cards
+- Glow hover effects
+- Gradient borders
+- Smooth hover animation
+
+4. LIVE VPS CALCULATOR
+
+This is VERY IMPORTANT.
+
+Create a professional VPS price calculator.
+
+LEFT SIDE:  
+Interactive controls:
+
+- vCPU slider (1–16)
+- RAM slider (1GB–64GB)
+- Storage slider (20GB–1000GB)
+- Bandwidth dropdown:
+    - 2TB
+    - 4TB
+    - 8TB
+    - Unlimited
+
+OS selector:
+
+- Ubuntu
+- Debian
+- AlmaLinux
+- Windows Server
+
+Add-ons:
+
+- Backups
+- cPanel
+- Managed Support
+- Extra IPv4
+- DDoS Protection
+
+RIGHT SIDE:  
+Live VPS summary card:
+
+- Selected specs
+- OS
+- Add-ons
+- Monthly price
+- Yearly price
+- Deploy button
+
+PRICE CALCULATION LOGIC
+
+Use:
+
+price =  
+(cpu * 4) +  
+(ram * 2) +  
+(storage * 0.08) +  
+bandwidthCost +  
+addonsCost
+
+Bandwidth:
+
+- 2TB = 0
+- 4TB = 5
+- 8TB = 10
+- Unlimited = 20
+
+Add-ons:
+
+- Backups = 5
+- cPanel = 12
+- Managed Support = 15
+- Extra IPv4 = 3
+- DDoS Protection = 7
+
+Must update live instantly.
+
+5. FEATURES SECTION
+
+Create premium feature cards:
+
+- NVMe SSD Storage
+- Dedicated Resources
+- Full Root Access
+- Instant Deployment
+- KVM Virtualization
+- DDoS Protection
+- 24/7 Support
+- 99.99% Uptime
+
+Each card:
+
+- Lucide icon
+- Modern gradient
+- Hover animation
+- Short description
+
+6. VPS VS SHARED HOSTING COMPARISON
+
+Create modern comparison table.
+
+Compare:
+
+- VPS Hosting
+- Shared Hosting
+
+Features:
+
+- Dedicated resources
+- Root access
+- Better performance
+- Scalability
+- Isolation
+- Security
+- Full OS control
+
+Use:
+
+- Green check icons
+- Red cross icons
+
+7. OPERATING SYSTEM TEMPLATES
+
+Create modern OS cards:
+
+- Ubuntu 24.04
+- Debian 12
+- AlmaLinux
+- Rocky Linux
+- Windows Server 2022
+- Docker Ready
+- cPanel Ready
+
+8. PERFORMANCE BENCHMARKS
+
+Create animated statistics:
+
+- NVMe Speed: 3500 MB/s
+- Network Port: 10Gbps
+- Uptime: 99.99%
+- Deployment Time: <60 sec
+
+Use:
+
+- Animated counters
+- Dashboard-style UI
+- Progress bars
+
+9. DATACENTER LOCATIONS
+
+Add locations:
+
+- USA
+- Germany
+- Singapore
+- Netherlands
+- UK
+
+Include:
+
+- World map background
+- Animated location markers
+- Ping indicators
+
+10. TESTIMONIALS
+
+Create premium testimonial carousel:
+
+- Customer avatars
+- Star ratings
+- Company names
+- Glassmorphism cards
+- Smooth slider animation
+ 
+11. FAQ SECTION
+
+Create accordion FAQs:
+
+- What is VPS hosting?
+- Managed vs unmanaged VPS?
+- Can I upgrade anytime?
+- Do you provide root access?
+- Which operating systems are supported?
+- Is DDoS protection included?
+- How fast is deployment?
+- Are backups included?
+
+12. FINAL CTA SECTION
+
+Headline:  
+“Deploy Your VPS Server in Under 60 Seconds”
+
+Subheadline:  
+“Enterprise-grade VPS infrastructure built for developers, agencies, and businesses.”
+
+Buttons:
+
+- Deploy Now
+- Contact Sales
+
+Add:
+
+- Animated glow background
+- Premium gradients
+
+13. FOOTER
+
+Reuse existing website footer if possible.
+ 
+SEO REQUIREMENTS
+
+Page title:  
+Affordable NVMe VPS Hosting in Pakistan | GENCORE IT
+
+Meta description:  
+High-performance NVMe VPS hosting with dedicated resources, instant deployment, full root access, and enterprise-grade infrastructure by GENCORE IT.
+
+Add:
+
+- Proper H1/H2 hierarchy
+- OpenGraph tags
+- Structured data if possible
+
+DESIGN REQUIREMENTS
+
+Style:
+
+- Dark modern cloud provider style
+- Blue/purple gradients
+- Premium infrastructure feel
+- Enterprise SaaS look
+
+Animations:
+
+- Framer Motion
+- Fade-up animations
+- Hover transitions
+- Glow effects
+
+UI:
+
+- Sticky navbar
+- Smooth scrolling
+- Mobile hamburger menu
+- Responsive design
+- Modern spacing
+- Rounded cards
+- Glassmorphism effects
+
+FINAL OUTPUT REQUIREMENTS
+
+Provide:
+
+- Complete production-ready code
+- Reusable components
+- Proper folder structure
+- Responsive design
+- Clean code
+- Optimized performance
+- Integrated route/page into existing site
+
+IMPORTANT:  
+Do NOT create mockups only.  
+Do NOT create incomplete sections.  
+Do NOT use placeholder lorem ipsum.  
+Generate the FULL WORKING VPS PAGE ready to deploy into the existing GENCORE IT website.

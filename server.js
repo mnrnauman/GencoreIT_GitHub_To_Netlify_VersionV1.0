@@ -122,6 +122,10 @@ app.get("/api/testimonials", (req, res) => {
   });
 });
 
+app.get("/vps-hosting", (req, res) => {
+  res.sendFile(path.join(__dirname, "vps-hosting.html"));
+});
+
 app.get("/{*path}", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
