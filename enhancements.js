@@ -23,7 +23,85 @@
   }
 
   /* ════════════════════════════════════
-     2. PHONE IN HEADER
+     2. VPS HOSTING NAV LINK
+  ════════════════════════════════════ */
+  function addVPSNavLink() {
+    if (document.getElementById('gc-vps-nav')) return true;
+
+    /* Find the nav element inside the header */
+    var nav = document.querySelector('header nav');
+    if (!nav) return false;
+
+    /* Find all anchor tags in the nav to locate the last one before any CTA */
+    var navLinks = nav.querySelectorAll('a');
+    if (!navLinks || navLinks.length === 0) return false;
+
+    /* Find the Testimonials link — insert VPS Hosting right after it */
+    var testimonialLink = null;
+    for (var i = 0; i < navLinks.length; i++) {
+      if (navLinks[i].getAttribute('href') === '/testimonials') {
+        testimonialLink = navLinks[i];
+        break;
+      }
+    }
+
+    /* Fallback: insert before the Contact/CTA link */
+    if (!testimonialLink) {
+      var contactLink = nav.querySelector('a[href="/contact"]');
+      if (!contactLink) return false;
+      testimonialLink = contactLink.previousElementSibling;
+      if (!testimonialLink) return false;
+    }
+
+    /* Build the VPS Hosting nav link styled to stand out */
+    var vpsLink = document.createElement('a');
+    vpsLink.id = 'gc-vps-nav';
+    vpsLink.href = '/vps-hosting';
+    vpsLink.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>VPS Hosting';
+
+    /* Copy className from an existing nav link for consistent styling */
+    if (navLinks[0]) vpsLink.className = navLinks[0].className;
+
+    document.head.insertAdjacentHTML('beforeend',
+      '<style>' +
+      '#gc-vps-nav{' +
+        'display:inline-flex!important;' +
+        'align-items:center;' +
+        'gap:4px;' +
+        'background:linear-gradient(135deg,rgba(79,125,255,0.15),rgba(139,92,246,0.1))!important;' +
+        'border:1.5px solid rgba(79,125,255,0.35)!important;' +
+        'border-radius:8px!important;' +
+        'padding:5px 12px!important;' +
+        'font-size:13.5px!important;' +
+        'font-weight:600!important;' +
+        'color:#7da8ff!important;' +
+        'text-decoration:none!important;' +
+        'transition:all .2s!important;' +
+        'white-space:nowrap;' +
+        'margin:0 2px;' +
+      '}' +
+      '#gc-vps-nav:hover{' +
+        'background:linear-gradient(135deg,rgba(79,125,255,0.28),rgba(139,92,246,0.2))!important;' +
+        'border-color:rgba(79,125,255,0.65)!important;' +
+        'color:#a8c5ff!important;' +
+        'transform:translateY(-1px);' +
+        'box-shadow:0 4px 16px rgba(79,125,255,0.25)!important;' +
+      '}' +
+      '</style>'
+    );
+
+    /* Insert right after the Testimonials link */
+    if (testimonialLink.nextSibling) {
+      testimonialLink.parentNode.insertBefore(vpsLink, testimonialLink.nextSibling);
+    } else {
+      testimonialLink.parentNode.appendChild(vpsLink);
+    }
+
+    return true;
+  }
+
+  /* ════════════════════════════════════
+     3. PHONE IN HEADER
   ════════════════════════════════════ */
   function addPhoneToHeader() {
     if (document.getElementById('gc-phone')) return;
@@ -151,6 +229,7 @@
     addWhatsAppButton();
 
     var headerDone = false;
+    var vpsDone = false;
     var trustDone = false;
     var attempts = 0;
     var maxAttempts = 60; /* 6 seconds max */
@@ -166,11 +245,15 @@
         }
       }
 
+      if (!vpsDone) {
+        vpsDone = addVPSNavLink();
+      }
+
       if (!trustDone) {
         trustDone = injectTrustBlock();
       }
 
-      if ((headerDone && trustDone) || attempts >= maxAttempts) {
+      if ((headerDone && vpsDone && trustDone) || attempts >= maxAttempts) {
         clearInterval(timer);
       }
     }, 100);
