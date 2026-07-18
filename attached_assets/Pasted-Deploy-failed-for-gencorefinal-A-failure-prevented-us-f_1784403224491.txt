@@ -1,0 +1,61 @@
+Deploy failed for gencorefinal
+A failure prevented us from deploying your project.
+Why did it fail?
+Update contact and subscription forms to use Resend for email delivery Replace nodemailer with Resend in Netlify functions for contact and subscription endpoints, updating netlify/functions/package.json accordingly. Replit-Commit-Author: Agent Replit-Commit-Session-Id: bf8b686e-97a2-4358-831a-96505631baff Replit-Commit-Checkpoint-Type: full_checkpoint Replit-Commit-Event-Id: 945cf15d-ba2d-4921-aa2a-421f11b18ced Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/378c61ae-b450-41f6-86c2-0f578cac03d2/bf8b686e-97a2-4358-831a-96505631baff/pw9sp6n Replit-Helium-Checkpoint-Created: true
+Today at 12:28 AM, by mnrnaumanmnrnauman on GitHub
+
+Production: main@251755b
+
+Functions
+Retry
+Deploy settings
+Delete deploy
+Deploy log
+Why did it fail?
+
+
+
+
+Maximize log
+Initializing
+Failed
+12:28:42 AM: build-image version: 969defd95f3977f8de9cb1f48802a7e6f3d8c0b3 (noble-new-builds)
+12:28:42 AM: buildbot version: b34371363d3ca30c2d1b8c0c23cb261247d6f156
+12:28:42 AM: Fetching cached dependencies
+12:28:42 AM: Starting to download cache of 2.4MB (Last modified: 2026-07-18 16:21:40 +0000 UTC)
+12:28:42 AM: Downloaded cache in 77ms
+12:28:42 AM: Extracted cache in 53ms
+12:28:42 AM: Fetched cache in 170ms
+12:28:42 AM: Starting to prepare the repo for build
+12:28:43 AM: Preparing Git Reference refs/heads/main
+12:28:44 AM: Custom functions path detected. Proceeding with the specified path: 'netlify/functions'
+12:28:44 AM: Installing dependencies
+12:28:44 AM: mise ~/.config/mise/config.toml tools: python@3.14.3
+12:28:44 AM: mise ~/.config/mise/config.toml tools: ruby@3.4.8
+12:28:44 AM: mise ~/.config/mise/config.toml tools: go@1.26.2
+12:28:44 AM: v22.23.1 is already installed.
+12:28:45 AM: Now using node v22.23.1 (npm v10.9.8)
+12:28:45 AM: Enabling Node.js Corepack
+12:28:45 AM: No npm workspaces detected
+12:28:45 AM: Installing npm packages using npm version 10.9.8
+12:29:55 AM: npm error code ENOTFOUND
+12:29:55 AM: npm error syscall getaddrinfo
+12:29:55 AM: npm error errno ENOTFOUND
+12:29:55 AM: npm error network request to http://package-firewall.replit.local/npm/standardwebhooks/-/standardwebhooks-1.0.0.tgz failed, reason: getaddrinfo ENOTFOUND package-firewall.replit.local
+12:29:55 AM: npm error network This is a problem related to network connectivity.
+12:29:55 AM: npm error network In most cases you are behind a proxy or have bad network settings.
+12:29:55 AM: npm error network
+12:29:55 AM: npm error network If you are behind a proxy, please make sure that the
+12:29:55 AM: npm error network 'proxy' config is set properly.  See: 'npm help config'
+12:29:55 AM: npm error A complete log of this run can be found in: /opt/buildhome/.npm/_logs/2026-07-18T19_28_45_445Z-debug-0.log
+12:29:55 AM: Error during npm install
+12:29:56 AM: Failed during stage 'Install dependencies': dependency_installation script returned non-zero exit code: 1
+12:29:56 AM: Failing build: Failed to install dependencies
+Building
+Complete
+Deploying
+Skipped
+Cleanup
+Skipped
+Post-processing
+Skipped
