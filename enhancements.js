@@ -223,56 +223,54 @@
 
   /* ════════════════════════════════════
      5. BRAND NAME + TAGLINE OVERRIDE
-     Replaces "Gencore IT" → "Gencore" and updates tagline
-     in the React-rendered navbar (pre-built bundle)
+     Uses MutationObserver so replacements survive React re-renders.
   ════════════════════════════════════ */
-  function overrideBrandText() {
-    var changed = false;
+  function sweepTextNodes(root) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while ((node = walker.nextNode())) {
+      if (!node.nodeValue) continue;
+      var v = node.nodeValue;
+      v = v.replace(/Gencore IT/g, 'Gencore');
+      v = v.replace(/GENCORE IT/g, 'GENCORE');
+      v = v.replace(/next generation core it solutions/gi, 'The Core of Digital Transformation.');
+      if (v !== node.nodeValue) node.nodeValue = v;
+    }
+  }
 
-    /* Logo name — targets the .name span inside the nav logo */
-    document.querySelectorAll('header .name, header [class*="logo"] span').forEach(function (el) {
-      if (el.textContent.trim() === 'Gencore IT') {
-        el.textContent = 'Gencore';
-        changed = true;
-      }
+  function startBrandObserver() {
+    /* Run once immediately on whatever is already in the DOM */
+    sweepTextNodes(document.body);
+
+    /* Then watch for any future DOM changes (React re-renders, route changes, etc.) */
+    var observer = new MutationObserver(function (mutations) {
+      /* Pause observer while we make changes to avoid infinite loops */
+      observer.disconnect();
+      mutations.forEach(function (m) {
+        if (m.type === 'childList') {
+          m.addedNodes.forEach(function (n) {
+            if (n.nodeType === Node.ELEMENT_NODE) sweepTextNodes(n);
+            if (n.nodeType === Node.TEXT_NODE) {
+              var v = n.nodeValue;
+              v = v.replace(/Gencore IT/g, 'Gencore');
+              v = v.replace(/GENCORE IT/g, 'GENCORE');
+              v = v.replace(/next generation core it solutions/gi, 'The Core of Digital Transformation.');
+              if (v !== n.nodeValue) n.nodeValue = v;
+            }
+          });
+        } else if (m.type === 'characterData') {
+          var v = m.target.nodeValue;
+          v = v.replace(/Gencore IT/g, 'Gencore');
+          v = v.replace(/GENCORE IT/g, 'GENCORE');
+          v = v.replace(/next generation core it solutions/gi, 'The Core of Digital Transformation.');
+          if (v !== m.target.nodeValue) m.target.nodeValue = v;
+        }
+      });
+      /* Resume observing */
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     });
 
-    /* Tagline — targets the .tagline span inside the nav logo */
-    document.querySelectorAll('header .tagline, header [class*="tagline"]').forEach(function (el) {
-      if (el.textContent.trim() === 'Next Generation Core IT Solutions' ||
-          el.textContent.trim() === 'NEXT GENERATION CORE IT SOLUTIONS') {
-        el.textContent = 'The Core of Digital Transformation.';
-        changed = true;
-      }
-    });
-
-    /* Sweep ALL text nodes in the entire page — header, footer, and anywhere else */
-    var containers = [
-      document.querySelector('header'),
-      document.querySelector('footer'),
-      document.body
-    ];
-
-    containers.forEach(function (container) {
-      if (!container) return;
-      var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
-      var node;
-      while ((node = walker.nextNode())) {
-        if (!node.nodeValue) continue;
-        var original = node.nodeValue;
-        /* Replace brand name — all casings: "Gencore IT", "GENCORE IT" */
-        node.nodeValue = node.nodeValue.replace(/Gencore IT/g, 'Gencore');
-        node.nodeValue = node.nodeValue.replace(/GENCORE IT/g, 'GENCORE');
-        /* Replace tagline — any casing */
-        node.nodeValue = node.nodeValue.replace(
-          /next generation core it solutions/gi,
-          'The Core of Digital Transformation.'
-        );
-        if (node.nodeValue !== original) changed = true;
-      }
-    });
-
-    return changed;
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   }
 
   /* ════════════════════════════════════
@@ -282,10 +280,12 @@
     /* Phone + WhatsApp can run immediately */
     addWhatsAppButton();
 
+    /* Start brand observer immediately — it self-sustains via MutationObserver */
+    startBrandObserver();
+
     var headerDone = false;
     var vpsDone = false;
     var trustDone = false;
-    var brandDone = false;
     var attempts = 0;
     var maxAttempts = 60; /* 6 seconds max */
 
@@ -308,11 +308,7 @@
         trustDone = injectTrustBlock();
       }
 
-      if (!brandDone) {
-        brandDone = overrideBrandText();
-      }
-
-      if ((headerDone && vpsDone && trustDone && brandDone) || attempts >= maxAttempts) {
+      if ((headerDone && vpsDone && trustDone) || attempts >= maxAttempts) {
         clearInterval(timer);
       }
     }, 100);
