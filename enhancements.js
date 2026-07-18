@@ -2,7 +2,7 @@
   'use strict';
 
   var WHATSAPP_NUMBER = '923320000911';
-  var WHATSAPP_MESSAGE = 'Hello! I visited the GENCORE IT website and would like to know more about your services.';
+  var WHATSAPP_MESSAGE = 'Hello! I visited the Gencore website and would like to know more about your services.';
   var PHONE_NUMBER = '+92 332 0000911';
   var PHONE_TEL = 'tel:+923320000911';
 
@@ -222,6 +222,57 @@
   }
 
   /* ════════════════════════════════════
+     5. BRAND NAME + TAGLINE OVERRIDE
+     Replaces "Gencore IT" → "Gencore" and updates tagline
+     in the React-rendered navbar (pre-built bundle)
+  ════════════════════════════════════ */
+  function overrideBrandText() {
+    var changed = false;
+
+    /* Logo name — targets the .name span inside the nav logo */
+    document.querySelectorAll('header .name, header [class*="logo"] span').forEach(function (el) {
+      if (el.textContent.trim() === 'Gencore IT') {
+        el.textContent = 'Gencore';
+        changed = true;
+      }
+    });
+
+    /* Tagline — targets the .tagline span inside the nav logo */
+    document.querySelectorAll('header .tagline, header [class*="tagline"]').forEach(function (el) {
+      if (el.textContent.trim() === 'Next Generation Core IT Solutions' ||
+          el.textContent.trim() === 'NEXT GENERATION CORE IT SOLUTIONS') {
+        el.textContent = 'The Core of Digital Transformation.';
+        changed = true;
+      }
+    });
+
+    /* Sweep ALL text nodes in the header — catches any React class names we don't know */
+    var header = document.querySelector('header');
+    if (header) {
+      var walker = document.createTreeWalker(header, NodeFilter.SHOW_TEXT, null, false);
+      var node;
+      while ((node = walker.nextNode())) {
+        if (!node.nodeValue) continue;
+        /* Replace brand name */
+        if (node.nodeValue.indexOf('Gencore IT') !== -1) {
+          node.nodeValue = node.nodeValue.replace(/Gencore IT/g, 'Gencore');
+          changed = true;
+        }
+        /* Replace tagline (handles any casing the React bundle uses) */
+        if (/next generation core it solutions/i.test(node.nodeValue)) {
+          node.nodeValue = node.nodeValue.replace(
+            /next generation core it solutions/gi,
+            'The Core of Digital Transformation.'
+          );
+          changed = true;
+        }
+      }
+    }
+
+    return changed;
+  }
+
+  /* ════════════════════════════════════
      POLLING — keeps retrying until React renders
   ════════════════════════════════════ */
   function pollUntilReady() {
@@ -231,6 +282,7 @@
     var headerDone = false;
     var vpsDone = false;
     var trustDone = false;
+    var brandDone = false;
     var attempts = 0;
     var maxAttempts = 60; /* 6 seconds max */
 
@@ -253,7 +305,11 @@
         trustDone = injectTrustBlock();
       }
 
-      if ((headerDone && vpsDone && trustDone) || attempts >= maxAttempts) {
+      if (!brandDone) {
+        brandDone = overrideBrandText();
+      }
+
+      if ((headerDone && vpsDone && trustDone && brandDone) || attempts >= maxAttempts) {
         clearInterval(timer);
       }
     }, 100);

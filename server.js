@@ -80,7 +80,7 @@ app.post("/api/subscribe", async (req, res) => {
         html: `
           <h2>New Newsletter Subscription</h2>
           <p><strong>Email:</strong> ${email}</p>
-          <p>This visitor has subscribed to the GENCORE IT newsletter.</p>
+          <p>This visitor has subscribed to the Gencore newsletter.</p>
         `,
       });
       console.log(`Newsletter subscription email sent for ${email}`);
@@ -101,21 +101,21 @@ app.get("/api/testimonials", (req, res) => {
         id: 1,
         name: "Sarah Johnson",
         position: "CTO, TravelEase Inc.",
-        content: "GENCORE IT's cloud migration solution transformed our operations. Their team was professional, responsive, and delivered exactly what we needed. The 24/7 support gives us peace of mind.",
+        content: "Gencore's cloud migration solution transformed our operations. Their team was professional, responsive, and delivered exactly what we needed. The 24/7 support gives us peace of mind.",
         rating: 5
       },
       {
         id: 2,
         name: "Michael Rodriguez",
         position: "CEO, MetroProp Holdings",
-        content: "Our custom CRM from GENCORE IT has streamlined our property management process completely. The attention to detail and understanding of our industry needs was impressive.",
+        content: "Our custom CRM from Gencore has streamlined our property management process completely. The attention to detail and understanding of our industry needs was impressive.",
         rating: 5
       },
       {
         id: 3,
         name: "Dr. Amanda Chen",
         position: "Director, HealthFirst Medical Group",
-        content: "The cybersecurity system GENCORE IT implemented for our healthcare practice has given us complete confidence in our data protection. Their knowledge of HIPAA compliance was invaluable.",
+        content: "The cybersecurity system Gencore implemented for our healthcare practice has given us complete confidence in our data protection. Their knowledge of HIPAA compliance was invaluable.",
         rating: 5
       }
     ]
@@ -132,7 +132,7 @@ app.get("/{*path}", (req, res) => {
 
 const PORT = 5000;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`GENCORE IT website running on port ${PORT}`);
+  console.log(`Gencore website running on port ${PORT}`);
   if (!process.env.SMTP_HOST) {
     console.log("⚠ Email not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS to enable email sending.");
   }
