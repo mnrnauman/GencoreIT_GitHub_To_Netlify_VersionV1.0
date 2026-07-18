@@ -223,19 +223,64 @@
 
   /* ════════════════════════════════════
      5. BRAND NAME + TAGLINE OVERRIDE
-     Uses MutationObserver so replacements survive React re-renders.
+     Covers: page titles, headings, header, footer, all body content.
+     Uses requestAnimationFrame debounce — never misses a React re-render.
   ════════════════════════════════════ */
+
+  /* Central patch function — all replacements in one place */
+  function patchStr(s) {
+    s = s.replace(/GENCORE IT/g, 'Gencore');
+    s = s.replace(/Gencore IT/g, 'Gencore');
+    s = s.replace(/next generation core it solutions/gi, 'The Core of Digital Transformation.');
+    return s;
+  }
+
+  /* Sweep every text node inside a given element */
   function sweepTextNodes(root) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
     var node;
     while ((node = walker.nextNode())) {
       if (!node.nodeValue) continue;
-      var v = node.nodeValue;
-      v = v.replace(/Gencore IT/g, 'Gencore');
-      v = v.replace(/GENCORE IT/g, 'GENCORE');
-      v = v.replace(/next generation core it solutions/gi, 'The Core of Digital Transformation.');
-      if (v !== node.nodeValue) node.nodeValue = v;
+      var patched = patchStr(node.nodeValue);
+      if (patched !== node.nodeValue) node.nodeValue = patched;
     }
+  }
+
+  /* Fix headings where "GENCORE" and " IT" live in SEPARATE sibling DOM nodes.
+     e.g. <h1>About <span style="color:orange">GENCORE</span> IT</h1>
+     sweepTextNodes() can't match "GENCORE IT" across siblings, so we handle
+     this by finding headings whose combined textContent contains "gencore it"
+     and erasing any child text node that is exclusively "IT" (with whitespace). */
+  function fixSplitNodes(root) {
+    var scope = root || document.body;
+    var headings = scope.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    headings.forEach(function (el) {
+      if (!/gencore\s*it/i.test(el.textContent)) return;
+      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+      var node;
+      while ((node = walker.nextNode())) {
+        var v = node.nodeValue;
+        /* Remove standalone " IT" text nodes that trail the brand span */
+        if (/^\s*IT\s*$/.test(v)) {
+          node.nodeValue = '';
+        /* Change the "GENCORE" or "Gencore" branded span text to "Gencore" */
+        } else if (/^GENCORE$/.test(v.trim())) {
+          node.nodeValue = v.replace('GENCORE', 'Gencore');
+        } else if (/^Gencore$/.test(v.trim())) {
+          /* already correct — no change needed */
+        } else {
+          /* catch any combined variant still in one node */
+          var p = patchStr(v);
+          if (p !== v) node.nodeValue = p;
+        }
+      }
+    });
+  }
+
+  /* Patch the browser tab title */
+  function sweepTitle() {
+    var patched = patchStr(document.title);
+    if (patched !== document.title) document.title = patched;
   }
 
   function markReady() {
@@ -243,45 +288,51 @@
   }
 
   function startBrandObserver() {
-    /* Safety fallback — reveal header/footer within 1.5s even if something goes wrong */
+    /* Safety fallback — reveal header/footer within 1.5s even if something fails */
     var safetyTimer = setTimeout(markReady, 1500);
 
-    /* Run once immediately on whatever is already in the DOM */
+    /* Initial full-page sweep */
     sweepTextNodes(document.body);
+    fixSplitNodes(document.body);
+    sweepTitle();
 
     /* Reveal header/footer now that text is patched */
     clearTimeout(safetyTimer);
     markReady();
 
-    /* Then watch for any future DOM changes (React re-renders, route changes, etc.) */
-    var observer = new MutationObserver(function (mutations) {
-      /* Pause observer while we make changes to avoid infinite loops */
-      observer.disconnect();
-      mutations.forEach(function (m) {
-        if (m.type === 'childList') {
-          m.addedNodes.forEach(function (n) {
-            if (n.nodeType === Node.ELEMENT_NODE) sweepTextNodes(n);
-            if (n.nodeType === Node.TEXT_NODE) {
-              var v = n.nodeValue;
-              v = v.replace(/Gencore IT/g, 'Gencore');
-              v = v.replace(/GENCORE IT/g, 'GENCORE');
-              v = v.replace(/next generation core it solutions/gi, 'The Core of Digital Transformation.');
-              if (v !== n.nodeValue) n.nodeValue = v;
-            }
-          });
-        } else if (m.type === 'characterData') {
-          var v = m.target.nodeValue;
-          v = v.replace(/Gencore IT/g, 'Gencore');
-          v = v.replace(/GENCORE IT/g, 'GENCORE');
-          v = v.replace(/next generation core it solutions/gi, 'The Core of Digital Transformation.');
-          if (v !== m.target.nodeValue) m.target.nodeValue = v;
-        }
-      });
-      /* Resume observing */
-      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    /* ── Body observer (debounced via requestAnimationFrame) ─────────────
+       React can fire dozens of mutations per route change. We batch them
+       all into a single sweep per animation frame to avoid infinite loops
+       and redundant work without ever needing to disconnect/reconnect.   */
+    var sweepPending = false;
+    var bodyObserver = new MutationObserver(function () {
+      if (!sweepPending) {
+        sweepPending = true;
+        requestAnimationFrame(function () {
+          sweepPending = false;
+          sweepTextNodes(document.body);
+          fixSplitNodes(document.body);
+        });
+      }
     });
+    bodyObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
 
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    /* ── Title observer ──────────────────────────────────────────────────
+       React Helmet / router sets document.title dynamically.
+       Observe the <title> element in <head> directly.                    */
+    var titleObserver = new MutationObserver(sweepTitle);
+    function observeTitle() {
+      var titleEl = document.querySelector('title');
+      if (titleEl) titleObserver.observe(titleEl, { childList: true, characterData: true, subtree: true });
+    }
+    observeTitle();
+
+    /* Also watch <head> in case React adds/replaces <title> later */
+    var headObserver = new MutationObserver(function () {
+      sweepTitle();
+      observeTitle();
+    });
+    headObserver.observe(document.head, { childList: true, subtree: true });
   }
 
   /* ════════════════════════════════════
