@@ -238,9 +238,20 @@
     }
   }
 
+  function markReady() {
+    document.documentElement.classList.add('gc-ready');
+  }
+
   function startBrandObserver() {
+    /* Safety fallback — reveal header/footer within 1.5s even if something goes wrong */
+    var safetyTimer = setTimeout(markReady, 1500);
+
     /* Run once immediately on whatever is already in the DOM */
     sweepTextNodes(document.body);
+
+    /* Reveal header/footer now that text is patched */
+    clearTimeout(safetyTimer);
+    markReady();
 
     /* Then watch for any future DOM changes (React re-renders, route changes, etc.) */
     var observer = new MutationObserver(function (mutations) {

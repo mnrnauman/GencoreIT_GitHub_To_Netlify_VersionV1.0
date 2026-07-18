@@ -46,6 +46,14 @@
 --radius: 0.75rem;
   }</style>
 
+    <!-- FOOC prevention: hide header/footer until enhancements.js patches brand text -->
+    <style>
+      html:not(.gc-ready) header,
+      html:not(.gc-ready) footer { opacity: 0 !important; }
+      html.gc-ready header,
+      html.gc-ready footer { transition: opacity 0.15s ease; }
+    </style>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Gencore - IT Solutions & Services</title>
