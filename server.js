@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -9,21 +9,9 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 const RECIPIENT_EMAIL = "info@gencoreit.com";
+const FROM_EMAIL = "noreply@gencoreit.com";
 
-function createTransporter() {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    return null;
-  }
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.post("/api/contact", async (req, res) => {
   const { name, email, company, message } = req.body;
@@ -32,35 +20,40 @@ app.post("/api/contact", async (req, res) => {
     return res.status(400).json({ success: false, message: "Name, email, and message are required." });
   }
 
-  const transporter = createTransporter();
-  if (transporter) {
-    try {
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || process.env.SMTP_USER,
-        to: RECIPIENT_EMAIL,
-        subject: `New Contact Form Submission from ${name}`,
-        html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          ${company ? `<p><strong>Company:</strong> ${company}</p>` : ""}
-          <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, "<br>")}</p>
-        `,
-        replyTo: email,
-      });
-      console.log(`Contact email sent from ${email}`);
-    } catch (err) {
-      console.error("Failed to send contact email:", err.message);
-    }
-  } else {
-    console.log("Contact form submission (email not configured):", { name, email, company, message });
-  }
+  try {
+    const { error } = await resend.emails.send({
+      from: `Gencore Website <${FROM_EMAIL}>`,
+      to: RECIPIENT_EMAIL,
+      replyTo: email,
+      subject: `New Contact Form Submission from ${name}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px;">
+          <h2 style="color:#1e3a5f;border-bottom:2px solid #f97316;padding-bottom:12px;">New Contact Form Submission</h2>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px 0;font-weight:bold;color:#374151;width:120px;">Name:</td><td style="padding:8px 0;color:#111827;">${name}</td></tr>
+            <tr><td style="padding:8px 0;font-weight:bold;color:#374151;">Email:</td><td style="padding:8px 0;color:#111827;"><a href="mailto:${email}" style="color:#f97316;">${email}</a></td></tr>
+            ${company ? `<tr><td style="padding:8px 0;font-weight:bold;color:#374151;">Company:</td><td style="padding:8px 0;color:#111827;">${company}</td></tr>` : ""}
+          </table>
+          <div style="margin-top:16px;">
+            <p style="font-weight:bold;color:#374151;margin-bottom:8px;">Message:</p>
+            <div style="background:#f9fafb;padding:16px;border-radius:6px;color:#111827;line-height:1.6;">${message.replace(/\n/g, "<br>")}</div>
+          </div>
+          <p style="margin-top:24px;font-size:12px;color:#9ca3af;">Sent via Gencore website contact form</p>
+        </div>
+      `,
+    });
 
-  res.status(201).json({
-    success: true,
-    message: "Thank you for your message. We will get back to you soon!",
-  });
+    if (error) {
+      console.error("Resend error (contact):", error);
+      return res.status(500).json({ success: false, message: "Failed to send message. Please try again." });
+    }
+
+    console.log(`Contact email sent from ${email}`);
+    res.status(201).json({ success: true, message: "Thank you for your message. We will get back to you soon!" });
+  } catch (err) {
+    console.error("Contact email exception:", err.message);
+    res.status(500).json({ success: false, message: "Failed to send message. Please try again." });
+  }
 });
 
 app.post("/api/subscribe", async (req, res) => {
@@ -70,28 +63,34 @@ app.post("/api/subscribe", async (req, res) => {
     return res.status(400).json({ success: false, message: "Email is required." });
   }
 
-  const transporter = createTransporter();
-  if (transporter) {
-    try {
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || process.env.SMTP_USER,
-        to: RECIPIENT_EMAIL,
-        subject: "New Newsletter Subscription",
-        html: `
-          <h2>New Newsletter Subscription</h2>
-          <p><strong>Email:</strong> ${email}</p>
-          <p>This visitor has subscribed to the Gencore newsletter.</p>
-        `,
-      });
-      console.log(`Newsletter subscription email sent for ${email}`);
-    } catch (err) {
-      console.error("Failed to send subscription email:", err.message);
-    }
-  } else {
-    console.log("Newsletter subscription (email not configured):", email);
-  }
+  try {
+    const { error } = await resend.emails.send({
+      from: `Gencore Website <${FROM_EMAIL}>`,
+      to: RECIPIENT_EMAIL,
+      subject: "New Newsletter Subscription",
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px;">
+          <h2 style="color:#1e3a5f;border-bottom:2px solid #f97316;padding-bottom:12px;">New Newsletter Subscription</h2>
+          <p style="color:#374151;">A new visitor has subscribed to the Gencore newsletter.</p>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px 0;font-weight:bold;color:#374151;width:120px;">Email:</td><td style="padding:8px 0;color:#111827;"><a href="mailto:${email}" style="color:#f97316;">${email}</a></td></tr>
+          </table>
+          <p style="margin-top:24px;font-size:12px;color:#9ca3af;">Sent via Gencore website newsletter signup</p>
+        </div>
+      `,
+    });
 
-  res.json({ success: true, message: "You have been subscribed successfully!" });
+    if (error) {
+      console.error("Resend error (subscribe):", error);
+      return res.status(500).json({ success: false, message: "Failed to subscribe. Please try again." });
+    }
+
+    console.log(`Newsletter subscription email sent for ${email}`);
+    res.json({ success: true, message: "You have been subscribed successfully!" });
+  } catch (err) {
+    console.error("Subscribe email exception:", err.message);
+    res.status(500).json({ success: false, message: "Failed to subscribe. Please try again." });
+  }
 });
 
 app.get("/api/testimonials", (req, res) => {
@@ -133,7 +132,9 @@ app.get("/{*path}", (req, res) => {
 const PORT = 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Gencore website running on port ${PORT}`);
-  if (!process.env.SMTP_HOST) {
-    console.log("⚠ Email not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS to enable email sending.");
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("⚠ RESEND_API_KEY not set — emails will not be sent.");
+  } else {
+    console.log("✓ Resend email service configured");
   }
 });
