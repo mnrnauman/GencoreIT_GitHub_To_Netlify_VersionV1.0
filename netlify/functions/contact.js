@@ -1,6 +1,7 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const RECIPIENT_EMAIL = "info@gencoreit.com";
+const RECIPIENT_EMAILS = ["info@gencoreit.com", "mnrnauman@gmail.com"];
+const FROM_SENDER = "Gencore Website <noreply@gencoreit.com>";
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -19,37 +20,72 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ success: false, message: "Name, email, and message are required." }) };
   }
 
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    try {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || "587"),
-        secure: process.env.SMTP_SECURE === "true",
-        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      });
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || process.env.SMTP_USER,
-        to: RECIPIENT_EMAIL,
-        subject: `New Contact Form Submission from ${name}`,
-        html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          ${company ? `<p><strong>Company:</strong> ${company}</p>` : ""}
-          <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, "<br>")}</p>
-        `,
-        replyTo: email,
-      });
-    } catch (err) {
-      console.error("Failed to send email:", err.message);
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM_SENDER,
+      to: RECIPIENT_EMAILS,
+      replyTo: email,
+      subject: `New Contact Form Submission from ${name}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px;">
+          <h2 style="color:#1e3a5f;border-bottom:2px solid #f97316;padding-bottom:12px;">New Contact Form Submission</h2>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px 0;font-weight:bold;color:#374151;width:120px;">Name:</td><td style="padding:8px 0;color:#111827;">${name}</td></tr>
+            <tr><td style="padding:8px 0;font-weight:bold;color:#374151;">Email:</td><td style="padding:8px 0;color:#111827;"><a href="mailto:${email}" style="color:#f97316;">${email}</a></td></tr>
+            ${company ? `<tr><td style="padding:8px 0;font-weight:bold;color:#374151;">Company:</td><td style="padding:8px 0;color:#111827;">${company}</td></tr>` : ""}
+          </table>
+          <div style="margin-top:16px;">
+            <p style="font-weight:bold;color:#374151;margin-bottom:8px;">Message:</p>
+            <div style="background:#f9fafb;padding:16px;border-radius:6px;color:#111827;line-height:1.6;">${message.replace(/\n/g, "<br>")}</div>
+          </div>
+          <p style="margin-top:24px;font-size:12px;color:#9ca3af;">Reply directly to this email to respond to ${name}.</p>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error("Resend error (contact):", JSON.stringify(error));
+      return {
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ success: false, message: "Failed to send message. Please try again." }),
+      };
     }
-  }
 
-  return {
-    statusCode: 201,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ success: true, message: "Thank you for your message. We will get back to you soon!" }),
-  };
+    console.log(`Contact email sent — Resend ID: ${data?.id}`);
+
+    await resend.emails.send({
+      from: FROM_SENDER,
+      to: email,
+      subject: "We received your message — Gencore",
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px;">
+          <h2 style="color:#1e3a5f;border-bottom:2px solid #f97316;padding-bottom:12px;">Thank you, ${name}!</h2>
+          <p style="color:#374151;line-height:1.6;">We've received your message and will get back to you within 1 business day.</p>
+          <div style="background:#f9fafb;padding:16px;border-radius:6px;margin:16px 0;">
+            <p style="font-weight:bold;color:#374151;margin:0 0 8px 0;">Your message:</p>
+            <p style="color:#6b7280;line-height:1.6;margin:0;">${message.replace(/\n/g, "<br>")}</p>
+          </div>
+          <p style="color:#374151;line-height:1.6;">In the meantime, feel free to call us at <strong>+92 332 0000911</strong> or visit our office at 4th Floor, Saeed Alam Tower, Liberty Market, Lahore.</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
+          <p style="color:#9ca3af;font-size:12px;margin:0;">Gencore — The Core of Digital Transformation.<br>info@gencoreit.com | gencoreit.com</p>
+        </div>
+      `,
+    });
+
+    return {
+      statusCode: 201,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ success: true, message: "Thank you for your message. We will get back to you soon!" }),
+    };
+  } catch (err) {
+    console.error("Contact email exception:", err.message);
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ success: false, message: "Failed to send message. Please try again." }),
+    };
+  }
 };
