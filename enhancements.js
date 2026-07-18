@@ -246,28 +246,31 @@
       }
     });
 
-    /* Sweep ALL text nodes in the header — catches any React class names we don't know */
-    var header = document.querySelector('header');
-    if (header) {
-      var walker = document.createTreeWalker(header, NodeFilter.SHOW_TEXT, null, false);
+    /* Sweep ALL text nodes in the entire page — header, footer, and anywhere else */
+    var containers = [
+      document.querySelector('header'),
+      document.querySelector('footer'),
+      document.body
+    ];
+
+    containers.forEach(function (container) {
+      if (!container) return;
+      var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
       var node;
       while ((node = walker.nextNode())) {
         if (!node.nodeValue) continue;
-        /* Replace brand name */
-        if (node.nodeValue.indexOf('Gencore IT') !== -1) {
-          node.nodeValue = node.nodeValue.replace(/Gencore IT/g, 'Gencore');
-          changed = true;
-        }
-        /* Replace tagline (handles any casing the React bundle uses) */
-        if (/next generation core it solutions/i.test(node.nodeValue)) {
-          node.nodeValue = node.nodeValue.replace(
-            /next generation core it solutions/gi,
-            'The Core of Digital Transformation.'
-          );
-          changed = true;
-        }
+        var original = node.nodeValue;
+        /* Replace brand name — all casings: "Gencore IT", "GENCORE IT" */
+        node.nodeValue = node.nodeValue.replace(/Gencore IT/g, 'Gencore');
+        node.nodeValue = node.nodeValue.replace(/GENCORE IT/g, 'GENCORE');
+        /* Replace tagline — any casing */
+        node.nodeValue = node.nodeValue.replace(
+          /next generation core it solutions/gi,
+          'The Core of Digital Transformation.'
+        );
+        if (node.nodeValue !== original) changed = true;
       }
-    }
+    });
 
     return changed;
   }
